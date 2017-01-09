@@ -265,13 +265,23 @@ _unix_watch_file(u3_ufil* fil_u, u3_udir* par_u, c3_c* pax_c);
 static u3_umon*
 _unix_get_mount_point(u3_noun mon)
 {
-  if ( c3n == u3ud(mon) ) {
-    c3_assert(!"mount point must be an atom");
+  if ( c3y == u3ud(mon) ) {
+    c3_assert(!"invalid new %hill card");
     u3z(mon);
     return NULL;
   }
 
-  c3_c* nam_c = u3r_string(mon);
+  u3_noun nam = u3k(u3h(mon));
+  if ( c3n == u3ud(nam) ) {
+    c3_assert(!"mount point must be an atom");
+    u3z(nam);
+    u3z(mon);
+    return NULL;
+  }
+
+  c3_o wri = u3k(u3t(mon));
+  c3_assert( c3y == wri || c3n == wri );
+  c3_c* nam_c = u3r_string(nam);
   u3_umon* mon_u;
 
   for ( mon_u = u3_Host.unx_u.mon_u;
@@ -290,6 +300,7 @@ _unix_get_mount_point(u3_noun mon)
     mon_u->dir_u.nex_u = NULL;
     mon_u->dir_u.kid_u = NULL;
     mon_u->nex_u = u3_Host.unx_u.mon_u;
+    mon_u->wri = wri;
     u3_Host.unx_u.mon_u = mon_u;
 
   }
@@ -297,6 +308,8 @@ _unix_get_mount_point(u3_noun mon)
     free(nam_c);
   }
 
+  u3z(nam);
+  u3z(wri);
   u3z(mon);
 
   return mon_u;
@@ -529,6 +542,16 @@ _delete_mount_point_out:
   u3z(mon);
 }
 
+/* _unix_commit_mount_point: commit from mount point
+*/
+static void
+_unix_commit_mount_point(u3_noun mon)
+{
+  u3_Host.unx_u.dyr = c3y;
+  u3z(mon);
+  return;
+}
+
 /* _unix_time_cb: timer callback
 */
 static void
@@ -537,7 +560,7 @@ _unix_time_cb(uv_timer_t* tim_u)
   u3_lo_open();
   {
     u3_Host.unx_u.alm = c3n;
-    u3_Host.unx_u.dyr = c3y;
+    u3_Host.unx_u.dyr = c3n;
   }
   u3_lo_shut(c3y);
 }
@@ -955,7 +978,7 @@ _unix_update_node(u3_unod* nod_u)
 static void
 _unix_update_mount(u3_umon* mon_u, u3_noun all)
 {
-  if ( c3n == mon_u->dir_u.dry ) {
+  if ( c3n == mon_u->dir_u.dry && c3y == mon_u->wri ) {
     u3_noun  can = u3_nul;
     u3_unod* nod_u;
     for ( nod_u = mon_u->dir_u.kid_u; nod_u; nod_u = nod_u->nex_u ) {
@@ -1257,6 +1280,14 @@ _unix_sync_ergo(u3_umon* mon_u, u3_noun can)
   u3z(can);
 }
 
+/* u3_unix_ef_dirk(): commit mount point
+*/
+void
+u3_unix_ef_dirk(u3_noun mon)
+{
+  _unix_commit_mount_point(mon);
+}
+
 /* u3_unix_ef_ergo(): update filesystem from urbit
 */
 void
@@ -1286,7 +1317,7 @@ u3_unix_ef_hill(u3_noun hil)
     _unix_scan_mount_point(mon_u);
   }
   u3z(hil);
-  u3_Host.unx_u.dyr = c3y;
+  u3_Host.unx_u.dyr = c3n;
   u3_unix_ef_look(c3y);
 }
 

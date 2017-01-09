@@ -350,6 +350,7 @@
       typedef struct _u3_umon {
         u3_udir          dir_u;             //  root directory, must be first
         c3_c*            nam_c;             //  mount point name
+        c3_o             wri;               /*  c3y if accepts writes */
         struct _u3_umon* nex_u;             //  internal list
       } u3_umon;
 
@@ -960,6 +961,11 @@
       */
         void
         u3_unix_ef_ergo(u3_noun mon, u3_noun can);
+
+      /* u3_unix_ef_dirk(): mark mount dirty
+      */
+        void
+        u3_unix_ef_dirk(u3_noun mon);
 
       /* u3_unix_ef_ogre(): delete mount point
       */
