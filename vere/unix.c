@@ -537,7 +537,7 @@ _unix_time_cb(uv_timer_t* tim_u)
   u3_lo_open();
   {
     u3_Host.unx_u.alm = c3n;
-    u3_Host.unx_u.dyr = c3y;
+    u3_Host.unx_u.dyr = c3n;
   }
   u3_lo_shut(c3y);
 }
