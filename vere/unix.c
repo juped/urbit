@@ -1286,7 +1286,7 @@ u3_unix_ef_hill(u3_noun hil)
     _unix_scan_mount_point(mon_u);
   }
   u3z(hil);
-  u3_Host.unx_u.dyr = c3y;
+  u3_Host.unx_u.dyr = c3n;
   u3_unix_ef_look(c3y);
 }
 
