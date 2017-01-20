@@ -265,13 +265,22 @@ _unix_watch_file(u3_ufil* fil_u, u3_udir* par_u, c3_c* pax_c);
 static u3_umon*
 _unix_get_mount_point(u3_noun mon)
 {
-  if ( c3n == u3ud(mon) ) {
-    c3_assert(!"mount point must be an atom");
+  if ( c3y == u3ud(mon) ) {
+    c3_assert(!"invalid new %hill card");
     u3z(mon);
     return NULL;
   }
 
-  c3_c* nam_c = u3r_string(mon);
+  u3_noun nam = u3k(u3h(mon));
+  if ( c3n == u3ud(nam) ) {
+    c3_assert(!"mount point must be an atom");
+    u3z(nam);
+    u3z(mon);
+    return NULL;
+  }
+
+  u3_noun wri = u3k(u3t(mon));
+  c3_c* nam_c = u3r_string(nam);
   u3_umon* mon_u;
 
   for ( mon_u = u3_Host.unx_u.mon_u;
@@ -290,6 +299,7 @@ _unix_get_mount_point(u3_noun mon)
     mon_u->dir_u.nex_u = NULL;
     mon_u->dir_u.kid_u = NULL;
     mon_u->nex_u = u3_Host.unx_u.mon_u;
+    mon_u->wri = wri;
     u3_Host.unx_u.mon_u = mon_u;
 
   }
@@ -297,6 +307,8 @@ _unix_get_mount_point(u3_noun mon)
     free(nam_c);
   }
 
+  u3z(nam);
+  u3z(wri);
   u3z(mon);
 
   return mon_u;
