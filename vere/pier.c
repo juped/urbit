@@ -487,6 +487,7 @@ _pier_apply(u3_pier* pir_u)
   u3_writ* wit_u;
   c3_o     act_o = c3n;
 
+  fprintf(stderr, "event queue start\r\n");
 start:
 
   /* iterate from queue exit, advancing any writs that can advance
@@ -573,6 +574,7 @@ start:
     act_o = c3n;
     goto start;
   }
+  fprintf(stderr, "event queue complete\r\n");
 }
 
 /* _pier_disk_load_precommit_file(): load precommit file into writ.
