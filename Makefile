@@ -362,14 +362,39 @@ V_OFILES=\
        vere/walk.o \
        vere/ivory.o
 
+T_OFILES=\
+       vere/ames.o \
+       vere/behn.o \
+       vere/cttp.o \
+       vere/http.o \
+       vere/newt.o \
+       vere/reck.o \
+       vere/time.o \
+       vere/unix.o \
+       vere/save.o \
+       vere/serf.o \
+       vere/pier.o \
+       vere/foil.o \
+       vere/walk.o \
+       vere/ivory.o
+
 MAIN_FILE =\
        vere/main.o
+
+TERM_FILE =\
+       vere/term-standalone.o
 
 VERE_OFILES=\
        $(OUT_OFILES) \
        $(BASE_OFILES) \
        $(MAIN_FILE) \
        $(V_OFILES)
+
+TERM_OFILES=\
+       $(OUT_OFILES) \
+       $(BASE_OFILES) \
+       $(TERM_FILE) \
+       $(T_OFILES)
 
 VERE_DFILES=$(VERE_OFILES:%.o=.d/%.d)
 
@@ -391,7 +416,7 @@ TAGS=\
        GPATH GTAGS GRTAGS \
        cscope.in.out cscope.po.out cscope.out
 
-all: urbit links
+all: urbit links term
 
 .MAKEFILE-VERSION: Makefile .make.conf
 	@echo "Makefile update."
@@ -404,6 +429,7 @@ links: urbit
 	$(LN) $(BIN)/urbit $(BIN)/urbit-worker
 
 urbit: $(BIN)/urbit
+term: $(BIN)/term
 
 $(LIBED25519):
 	$(MAKE) -C outside/ed25519
@@ -431,6 +457,17 @@ $(BIN)/urbit: $(LIBCOMMONMARK) $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(
 	@echo "    CCLD  $(BIN)/urbit"
 	@mkdir -p $(BIN)
 	@$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+endif
+
+ifdef NO_SILENT_RULES
+$(BIN)/term: $(LIBCOMMONMARK) $(TERM_OFILES) $(LIBUV) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+	mkdir -p $(BIN)
+	$(CLD) $(CLDOSFLAGS) -o $(BIN)/term $(TERM_OFILES) $(LIBUV) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+else
+$(BIN)/term: $(LIBCOMMONMARK) $(TERM_OFILES) $(LIBUV) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+	@echo "    CCLD  $(BIN)/term"
+	@mkdir -p $(BIN)
+	@$(CLD) $(CLDOSFLAGS) -o $(BIN)/term $(TERM_OFILES) $(LIBUV) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
 endif
 
 tags: ctags etags gtags cscope
