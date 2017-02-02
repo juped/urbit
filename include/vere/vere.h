@@ -723,6 +723,7 @@
           u3_disk*         log_u;               //  event log
           u3_lord*         god_u;               //  computer
           u3_ames*         sam_u;              //  packet interface
+          u3_moat*         cli_u;               //  client socket
           u3_writ*         ent_u;               //  entry of queue
           u3_writ*         ext_u;               //  exit of queue
         } u3_pier;
