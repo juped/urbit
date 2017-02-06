@@ -22,7 +22,9 @@
 #include "all.h"
 #include "vere/vere.h"
 
-void term_event_fire(u3_noun pax, u3_noun fav);
+u3_mojo moj_u;
+
+void _term_event_fire(u3_noun pax, u3_noun fav);
 static        void _term_spinner_cb(void*);
 static        void _term_read_tn_cb(uv_stream_t* tcp_u,
                                     ssize_t      siz_i,
@@ -86,7 +88,7 @@ _term_close_cb(uv_handle_t* han_t)
   {
     u3_noun tid = u3dc("scot", c3__ud, tty_u->tid_l);
     u3_noun pax = u3nq(u3_blip, c3__term, tid, u3_nul);
-    term_event_fire(u3k(pax), u3nc(c3__hook, u3_nul));
+    _term_event_fire(u3k(pax), u3nc(c3__hook, u3_nul));
     u3z(pax);
   }
   free(tty_u);
@@ -339,9 +341,9 @@ _term_listen_cb(uv_stream_t *wax_u, int sas_i)
     {
       u3_noun tid = u3dc("scot", c3__ud, tty_u->tid_l);
       u3_noun pax = u3nq(u3_blip, c3__term, tid, u3_nul);
-      // term_event_fire(u3k(pax), u3nq(c3__flow, c3__seat, c3__dojo, u3_nul));
-      term_event_fire(u3k(pax), u3nc(c3__blew, u3nc(80, 25)));
-      term_event_fire(u3k(pax), u3nc(c3__hail, u3_nul));
+      // _term_event_fire(u3k(pax), u3nq(c3__flow, c3__seat, c3__dojo, u3_nul));
+      _term_event_fire(u3k(pax), u3nc(c3__blew, u3nc(80, 25)));
+      _term_event_fire(u3k(pax), u3nc(c3__hail, u3_nul));
       u3z(pax);
     }
 
@@ -722,7 +724,7 @@ _term_io_belt(u3_utty* uty_u, u3_noun  blb)
   u3_noun tid = u3dc("scot", c3__ud, uty_u->tid_l);
   u3_noun pax = u3nq(u3_blip, c3__term, tid, u3_nul);
 
-  term_event_fire(pax, u3nc(c3__belt, blb));
+  _term_event_fire(pax, u3nc(c3__belt, blb));
 }
 
 /* _tel_event(): telnet sucker
@@ -794,7 +796,7 @@ _tel_opt(_te_nvt* nvt, telnet_byte opt, _to_evt* evt)
       tid = u3dc("scot", c3__ud, tel_u->uty_t.tid_l);
       pax = u3nq(u3_blip, c3__term, tid, u3_nul);
       blu = u3nc(col_s, row_s);
-      term_event_fire(pax, u3nc(c3__blew, blu));
+      _term_event_fire(pax, u3nc(c3__blew, blu));
       break;
     }
   }
@@ -1215,7 +1217,7 @@ u3_term_ef_winc(void)
 {
   u3_noun pax = u3nq(u3_blip, c3__term, '1', u3_nul);
 
-  term_event_fire(pax, u3nc(c3__blew, u3_term_get_blew(1)));
+  _term_event_fire(pax, u3nc(c3__blew, u3_term_get_blew(1)));
 }
 
 /* u3_term_ef_ctlc(): send ^C on console.
@@ -1225,7 +1227,7 @@ u3_term_ef_ctlc(void)
 {
   u3_noun pax = u3nq(u3_blip, c3__term, '1', u3_nul);
 
-  term_event_fire(pax, u3nt(c3__belt, c3__ctl, 'c'));
+  _term_event_fire(pax, u3nt(c3__belt, c3__ctl, 'c'));
 }
 
 /* u3_term_ef_boil(): initial effects for loaded servers.
@@ -1236,10 +1238,10 @@ u3_term_ef_boil(void)
   {
     u3_noun pax = u3nq(u3_blip, c3__term, '1', u3_nul);
 
-    //  term_event_fire(u3k(pax), u3nc(c3__init, u3k(u3h(u3A->own))));
-    term_event_fire(u3k(pax), u3nc(c3__harm, u3_nul));
-    term_event_fire(u3k(pax), u3nc(c3__blew, u3_term_get_blew(1)));
-    term_event_fire(u3k(pax), u3nc(c3__hail, u3_nul));
+    //  _term_event_fire(u3k(pax), u3nc(c3__init, u3k(u3h(u3A->own))));
+    _term_event_fire(u3k(pax), u3nc(c3__harm, u3_nul));
+    _term_event_fire(u3k(pax), u3nc(c3__blew, u3_term_get_blew(1)));
+    _term_event_fire(u3k(pax), u3nc(c3__hail, u3_nul));
 
     u3z(pax);
   }
@@ -1252,7 +1254,7 @@ u3_term_ef_verb(void)
 {
   u3_noun pax = u3nq(u3_blip, c3__term, '1', u3_nul);
 
-  term_event_fire(pax, u3nc(c3__verb, u3_nul));
+  _term_event_fire(pax, u3nc(c3__verb, u3_nul));
 }
 
 /* u3_term_ef_ticket(): initial effects for new ticket.
@@ -1278,7 +1280,7 @@ u3_term_ef_ticket(c3_c* who_c, c3_c* tic_c)
   }
   else { tic = u3k(u3t(tuc)); u3z(tuc); }
 
-  term_event_fire(pax, u3nt(c3__tick, who, tic));
+  _term_event_fire(pax, u3nt(c3__tick, who, tic));
 }
 
 /* u3_term_ef_bake(): initial effects for new terminal.
@@ -1288,10 +1290,10 @@ u3_term_ef_bake(u3_noun fav)
 {
   u3_noun pax = u3nq(u3_blip, c3__term, '1', u3_nul);
 
-  term_event_fire(u3k(pax), u3nc(c3__boot, fav));
-  // term_event_fire(u3k(pax), u3nq(c3__flow, c3__seat, c3__dojo, u3_nul));
-  term_event_fire(u3k(pax), u3nc(c3__blew, u3_term_get_blew(1)));
-  term_event_fire(u3k(pax), u3nc(c3__hail, u3_nul));
+  _term_event_fire(u3k(pax), u3nc(c3__boot, fav));
+  // _term_event_fire(u3k(pax), u3nq(c3__flow, c3__seat, c3__dojo, u3_nul));
+  _term_event_fire(u3k(pax), u3nc(c3__blew, u3_term_get_blew(1)));
+  _term_event_fire(u3k(pax), u3nc(c3__hail, u3_nul));
 
   u3z(pax);
 }
@@ -1300,9 +1302,9 @@ u3_term_ef_bunk()
 {
   u3_noun pax = u3nq(u3_blip, c3__term, '1', u3_nul);
 
-  // term_event_fire(u3k(pax), u3nq(c3__flow, c3__seat, c3__dojo, u3_nul));
-  term_event_fire(u3k(pax), u3nc(c3__blew, u3_term_get_blew(1)));
-  term_event_fire(u3k(pax), u3nc(c3__hail, u3_nul));
+  // _term_event_fire(u3k(pax), u3nq(c3__flow, c3__seat, c3__dojo, u3_nul));
+  _term_event_fire(u3k(pax), u3nc(c3__blew, u3_term_get_blew(1)));
+  _term_event_fire(u3k(pax), u3nc(c3__hail, u3_nul));
 
   u3z(pax);
 }
@@ -1504,10 +1506,16 @@ u3_term_io_loja(int x)
   }
 }
 
-void term_event_fire(u3_noun pax, u3_noun fav)
+void _term_event_fire(u3_noun pax, u3_noun fav)
 {
   u3_atom evt_a = u3ke_jam(u3nc(pax, fav));
-  uL(fprintf(stderr, "%x\r\n", evt_a));
+  u3_newt_write(&moj_u, evt_a, 0);
+}
+
+void _term_bail(void *vod_p, const c3_c *err)
+{
+  fprintf(stderr, "_term_bail: %s\r\n", err);
+  exit(1);
 }
 
 c3_i main(c3_i argc, c3_c **argv)
@@ -1515,7 +1523,11 @@ c3_i main(c3_i argc, c3_c **argv)
   u3_Host.ops_u.dem = c3n;
   u3_Host.lup_u = uv_default_loop();
 
-  u3m_boot_new("term-standalone");
+  moj_u.bal_f = _term_bail;
+  uv_pipe_init(u3_Host.lup_u, &moj_u.pyp_u, 0);
+  uv_pipe_open(&moj_u.pyp_u, open("client.sock", O_WRONLY));
+
+  u3m_boot_pier();
   {
     extern c3_w u3_Ivory_length_w;
     extern c3_y u3_Ivory_pill_y[];
