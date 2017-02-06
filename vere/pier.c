@@ -22,6 +22,14 @@
 #include "all.h"
 #include "vere/vere.h"
 
+void print_time(const char *msg)
+{
+  struct timeval t;
+  gettimeofday(&t, 0);
+  fprintf(stderr, "%s: %f\r\n", msg,
+          (double)t.tv_sec + ((double)t.tv_usec / 1000000));
+}
+
   /*    event handling proceeds on two parallel paths.  on the first
   **    path, the event is processed in the child worker process (serf).
   **    state transitions are as follows:
@@ -171,6 +179,7 @@ _pier_disk_precommit_complete(void*    vod_p,
     log_u->pre_d = wit_u->evt_d;
   }
   _pier_apply(pir_u);
+  print_time("precommit_complete");
 }
 
 /* _pier_disk_precommit_request(): start save request.
@@ -221,6 +230,7 @@ _pier_disk_precommit_request(u3_writ* wit_u)
   /* mark as precommitted.
   */
   log_u->rep_d += 1;
+  print_time("precommit_request");
 }
 
 /* _pier_disk_precommit_replace(): replace precommit.
@@ -255,6 +265,7 @@ _pier_disk_precommit_replace(u3_writ* wit_u)
     c3_assert(wit_u->evt_d == log_u->rep_d);
     log_u->rep_d -= 1ULL;
   }
+  print_time("precommit_replace");
 }
 
 /* _pier_disk_commit_complete(): commit complete.
@@ -277,6 +288,7 @@ _pier_disk_commit_complete(void* vod_p)
   }
 
   _pier_apply(pir_u);
+  print_time("commit_complete");
 }
 
 /* _pier_disk_commit_request(): start commit.
@@ -309,6 +321,7 @@ _pier_disk_commit_request(u3_writ* wit_u)
     c3_assert(wit_u->evt_d == (1ULL + log_u->moc_d));
     log_u->moc_d += 1ULL;
   }
+  print_time("commit_request");
 }
 
 /* _pier_dispose(): dispose of writ.
