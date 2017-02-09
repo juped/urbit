@@ -84,9 +84,9 @@ ifeq ($(OS),bsd)
 endif
 
 ifeq ($(STATIC),yes)
-LIBS=-lssl -lcrypto -luv -lncurses /usr/local/lib/libsigsegv.a /usr/local/lib/libgmp.a $(CURLLIB) $(OSLIBS)
+LIBS=-lssl -lcrypto -luv -lcmark -lncurses /usr/local/lib/libsigsegv.a /usr/local/lib/libgmp.a $(CURLLIB) $(OSLIBS)
 else
-LIBS=-lssl -lcrypto -luv -lgmp -lncurses -lsigsegv $(CURLLIB) $(OSLIBS)
+LIBS=-lssl -lcrypto -luv -lcmark -lgmp -lncurses -lsigsegv $(CURLLIB) $(OSLIBS)
 endif
 
 INCLUDE=include
@@ -112,8 +112,6 @@ CFLAGS+= $(COSFLAGS) -ffast-math \
 	-I$(INCLUDE) \
 	-Ioutside/anachronism/include \
 	-Ioutside/ed25519/src \
-	-Ioutside/commonmark/src \
-	-Ioutside/commonmark/build/src \
 	-Ioutside/scrypt \
 	-Ioutside/softfloat-3/source/include \
 	-Ioutside/murmur3 \
@@ -379,8 +377,6 @@ LIBED25519=outside/ed25519/ed25519.a
 
 LIBANACHRONISM=outside/anachronism/build/libanachronism.a
 
-LIBCOMMONMARK=outside/commonmark/build/src/libcmark.a
-
 LIBSCRYPT=outside/scrypt/scrypt.a
 
 LIBSOFTFLOAT=outside/softfloat-3/build/Linux-386-GCC/softfloat.a
@@ -411,9 +407,6 @@ $(LIBED25519):
 $(LIBANACHRONISM):
 	$(MAKE) -C outside/anachronism static
 
-$(LIBCOMMONMARK):
-	$(MAKE) -C outside/commonmark
-
 $(LIBSCRYPT):
 	$(MAKE) -C outside/scrypt MDEFINES="$(MDEFINES)"
 
@@ -423,14 +416,14 @@ $(LIBSOFTFLOAT):
 $(V_OFILES): include/vere/vere.h
 
 ifdef NO_SILENT_RULES
-$(BIN)/urbit: $(LIBCOMMONMARK) $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+$(BIN)/urbit: $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
 	mkdir -p $(BIN)
-	$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+	$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBSCRYPT) $(LIBSOFTFLOAT)
 else
-$(BIN)/urbit: $(LIBCOMMONMARK) $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+$(BIN)/urbit: $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
 	@echo "    CCLD  $(BIN)/urbit"
 	@mkdir -p $(BIN)
-	@$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+	@$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBSCRYPT) $(LIBSOFTFLOAT)
 endif
 
 tags: ctags etags gtags cscope
