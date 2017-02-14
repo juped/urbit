@@ -358,6 +358,7 @@ V_OFILES=\
        vere/save.o \
        vere/serf.o \
        vere/pier.o \
+       vere/king.o \
        vere/foil.o \
        vere/walk.o \
        vere/ivory.o

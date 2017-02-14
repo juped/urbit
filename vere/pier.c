@@ -1244,38 +1244,6 @@ _pier_work_create(u3_pier* pir_u)
   return god_u;
 }
 
-void _pier_sock_poke(void *vod_p, u3_noun mat)
-{
-  u3_noun cell = u3ke_cue(u3k(mat));
-  u3_noun pax  = u3k(u3h(cell));
-  u3_noun fav  = u3k(u3t(cell));
-  u3_pier_plan(pax, fav);
-  u3z(mat); u3z(cell);
-}
-
-void _pier_sock_bail(void *vod_p, const c3_c *err_c)
-{
-  fprintf(stderr, "_pier_sock_bail\r\n");
-}
-
-u3_moat*
-_pier_sock_create(u3_pier *pir_u)
-{
-  u3_moat *cli_u = c3_malloc(sizeof(u3_moat));
-
-  memset(cli_u, 0, sizeof(u3_moat));
-
-  uv_pipe_init(u3L, &cli_u->pyp_u, 0);
-  mkfifo("client.sock", 0666);
-  uv_pipe_open(&cli_u->pyp_u, open("client.sock", O_RDONLY | O_NONBLOCK));
-
-  cli_u->vod_p = pir_u; /* ??? */
-  cli_u->pok_f = _pier_sock_poke;
-  cli_u->bal_f = _pier_sock_bail;
-
-  return cli_u;
-}
-
 /* u3_pier_create(): create a pier, loading existing.
 */
 u3_pier*
@@ -1311,8 +1279,6 @@ u3_pier_create(c3_c* pax_c, c3_c* sys_c)
     if ( !(pir_u->god_u = _pier_work_create(pir_u)) ) {
       return 0;
     }
-    pir_u->cli_u = _pier_sock_create(pir_u);
-    u3_newt_read(pir_u->cli_u);
   }
 
   /* install in pier table
@@ -1856,37 +1822,9 @@ u3_pier_boot(c3_c* pax_c,                   //  pier path
 {
   uv_prepare_t pep_u;
 
-  u3_Host.lup_u = uv_default_loop();
-
-  /* start up a "fast-compile" arvo for internal use only
-  */
-  u3m_boot_pier();
-  {
-    extern c3_w u3_Ivory_length_w;
-    extern c3_y u3_Ivory_pill_y[];
-    u3_noun     lit;
-
-    lit = u3i_bytes(u3_Ivory_length_w, u3_Ivory_pill_y);
-    u3v_boot_lite(lit);
-  }
-
-  /* make initial pier
-  */
   _pier_boot_make(pax_c, sys_c);
 
-  /* initialize polling handle
-  */
-  uv_prepare_init(u3_Host.lup_u, &pep_u);
+  uv_prepare_init(u3L, &pep_u);
   uv_prepare_start(&pep_u, _pier_loop_prepare);
-
-  /* initialize loop - move to _pier_boot_make().
-  */
   _pier_loop_init();
-
-  /* enter loop
-  */
-  uv_run(u3L, UV_RUN_DEFAULT);
-
-  _pier_loop_exit();
-  exit(0);
 }

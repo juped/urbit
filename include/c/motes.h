@@ -312,6 +312,7 @@
 #   define c3__dojo   c3_s4('d','o','j','o')
 #   define c3__dome   c3_s4('d','o','m','e')
 #   define c3__done   c3_s4('d','o','n','e')
+#   define c3__doom   c3_s4('d','o','o','m')
 #   define c3__door   c3_s4('d','o','o','r')
 #   define c3__dorn   c3_s4('d','o','r','n')
 #   define c3__dost   c3_s4('d','o','s','t')
