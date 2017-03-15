@@ -369,6 +369,9 @@ MAIN_FILE =\
 SERF_FILE =\
        vere/serf.o
 
+CTL_FILE =\
+       vere/ctl.o
+
 VERE_OFILES=\
        $(OUT_OFILES) \
        $(BASE_OFILES) \
@@ -381,11 +384,19 @@ SERF_OFILES=\
        $(SERF_FILE) \
        $(V_OFILES)
 
+CTL_OFILES=\
+       $(OUT_OFILES) \
+       $(BASE_OFILES) \
+       $(CTL_FILE) \
+       $(V_OFILES)
+
 VERE_DFILES=$(VERE_OFILES:%.o=.d/%.d)
 SERF_DFILES=$(SERF_OFILES:%.o=.d/%.d)
+CTL_DFILES=$(CTL_OFILES:%.o=.d/%.d)
 
 -include $(VERE_DFILES)
 -include $(SERF_DFILES)
+-include $(CTL_DFILES)
 
 LIBED25519=outside/ed25519/ed25519.a
 
@@ -403,7 +414,7 @@ TAGS=\
        GPATH GTAGS GRTAGS \
        cscope.in.out cscope.po.out cscope.out
 
-all: urbit urbit-worker
+all: urbit urbit-worker urbctl
 
 .MAKEFILE-VERSION: Makefile .make.conf
 	@echo "Makefile update."
@@ -414,6 +425,7 @@ all: urbit urbit-worker
 
 urbit: $(BIN)/urbit
 urbit-worker: $(BIN)/urbit-worker
+urbctl: $(BIN)/urbctl
 
 $(LIBED25519):
 	$(MAKE) -C outside/ed25519
@@ -454,6 +466,17 @@ $(BIN)/urbit-worker: $(LIBCOMMONMARK) $(SERF_OFILES) $(LIBED25519) $(LIBANACHRON
 	@$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit-worker $(SERF_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
 endif
 
+ifdef NO_SILENT_RULES
+$(BIN)/urbctl: $(LIBCOMMONMARK) $(CTL_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+	mkdir -p $(BIN)
+	$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbctl $(CTL_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+else
+$(BIN)/urbctl: $(LIBCOMMONMARK) $(CTL_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+	@echo "    CCLD  $(BIN)/urbctl"
+	@mkdir -p $(BIN)
+	@$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbctl $(CTL_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+endif
+
 tags: ctags etags gtags cscope
 
 ctags:
@@ -487,6 +510,8 @@ debinstall:
 
 clean:
 	$(RM) $(VERE_OFILES) $(BIN)/urbit urbit.pkg $(VERE_DFILES) $(TAGS)
+	$(RM) $(SERF_OFILES) $(BIN)/urbit-worker $(SERF_DFILES)
+	$(RM) $(CTL_OFILES) $(BIN)/urbctl $(CTL_DFILES)
 	$(RM) -r debian/files debian/urbit*
 
 # 'make distclean all -jn' ∀ n>1 still does not work because it is possible
