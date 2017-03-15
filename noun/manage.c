@@ -482,12 +482,12 @@ u3m_mark(void)
 /* _cm_pave(): instantiate or activate image.
 */
 static void
-_cm_pave(c3_o nuu_o)
+_cm_pave(c3_o nuu_o, c3_w words)
 {
   if ( c3y == nuu_o ) {
     u3H = (void *)_pave_north(u3_Loom + 1, 
                               c3_wiseof(u3v_home), 
-                              u3a_words - 1);
+                              words - 1);
     u3R = &u3H->rod_u;
 
     _pave_parts();
@@ -495,7 +495,7 @@ _cm_pave(c3_o nuu_o)
   else {
     u3H = (void *)_find_north(u3_Loom + 1, 
                               c3_wiseof(u3v_home), 
-                              u3a_words - 1);
+                              words - 1);
     u3R = &u3H->rod_u;
   }
 }
@@ -1504,7 +1504,7 @@ _cm_init(c3_o chk_o)
 /* _cm_init_new(): start the environment.
 */
 void
-_cm_init_new(void)
+_cm_init_new(c3_w len_w)
 {
   _cm_limits();
   _cm_signals();
@@ -1516,7 +1516,6 @@ _cm_init_new(void)
   /* Map at fixed address.
   */
   {
-    c3_w  len_w = u3a_bytes;
     void* map_v;
 
     map_v = mmap((void *)u3_Loom,
@@ -1616,7 +1615,7 @@ u3m_boot(c3_o nuu_o, c3_c* dir_c, c3_c *pil_c)
 
   /* Construct or activate the allocator.
   */
-  _cm_pave(nuu_o);
+  _cm_pave(nuu_o, u3a_words);
 
   /* Initialize the jet system.
   */
@@ -1652,7 +1651,7 @@ u3m_boot_new(c3_c* dir_c)
 
   /* Activate the loom.
   */
-  _cm_init_new();
+  _cm_init_new(u3a_bytes);
 
   /* Activate the storage system.
   */
@@ -1664,7 +1663,7 @@ u3m_boot_new(c3_c* dir_c)
 
   /* Construct or activate the allocator.
   */
-  _cm_pave(nuu_o);
+  _cm_pave(nuu_o, u3a_words);
 
   /* Initialize the jet system.
   */
@@ -1694,7 +1693,7 @@ u3m_boot_pier(void)
 {
   /* Activate the loom.
   */
-  _cm_init_new();
+  _cm_init_new(u3a_bytes);
 
   /* Activate tracing.
   */
@@ -1702,7 +1701,7 @@ u3m_boot_pier(void)
 
   /* Construct or activate the allocator.
   */
-  _cm_pave(c3y);
+  _cm_pave(c3y, u3a_words);
 
   /* Initialize the jet system.
   */
@@ -1712,5 +1711,15 @@ u3m_boot_pier(void)
   */
   memset(u3A, 0, sizeof(*u3A));
 
+  return 0;
+}
+
+/* u3m_boot_lite(): just get a loom for nouns
+*/
+c3_d
+u3m_boot_lite(void)
+{
+  _cm_init_new(1 << 20);
+  _cm_pave(c3y, 1 << 18);
   return 0;
 }

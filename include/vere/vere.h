@@ -257,6 +257,8 @@
         c3_d             len_d;
         c3_y*            rag_y;
         struct _u3_moor* nex_u;
+        c3_y*            who_w;  /* XXX */
+        c3_w             ter_w;
       } u3_moor;
 
     /* u3_foil: abstract chub-addressed file.
@@ -723,6 +725,7 @@
           c3_d             gen_d;               //  last event discovered
           c3_d             but_d;               //  boot barrier
           c3_d             key_d[4];            //  save and passkey
+          c3_y             who_y[16];           //  LSB-first identity
           u3_disk*         log_u;               //  event log
           u3_lord*         god_u;               //  computer
           u3_ames*         sam_u;               //  packet interface
@@ -1492,7 +1495,8 @@
       /* u3_pier_boot(): start the new pier system.
       */
         void
-        u3_pier_boot(c3_c* pax_c,                   //  pier path
+        u3_pier_boot(u3_atom who_n,                 //  identity
+                     c3_c* pax_c,                   //  pier path
                      c3_c* sys_c,                   //  path to boot pill
                      uv_prepare_t *pep_u);
 

@@ -342,10 +342,10 @@ u3_serf_boot(void)
   _serf_send(u3nt(c3__play, u3i_chubs(1, &nex_d), 0));
 }
 
-/* u3_serf_main(): main() when run as urbit-client
+/* main(): urbit-worker main()
 */
 c3_i
-u3_serf_main(c3_i argc, c3_c* argv[])
+main(c3_i argc, c3_c* argv[])
 {
   uv_loop_t* lup_u = uv_default_loop();
   c3_c*      dir_c = argv[1];

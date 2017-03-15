@@ -422,112 +422,18 @@ c3_i
 main(c3_i   argc,
      c3_c** argv)
 {
-  //  Detect executable purpose.
-  //
-  {
-    c3_c* nam_c = strrchr(argv[0], '/');
-
-    if ( !nam_c ) 
-      nam_c = argv[0];
-    else nam_c++;
-
-    if ( !strcmp("urbit-worker", nam_c) ) {
-      return u3_serf_main(argc, argv);
-    }
-  }
-
-  //  Parse options.
-  //
-  if ( c3n == _main_getopt(argc, argv) ) {
-    u3_ve_usage(argc, argv);
-    return 1;
-  }
-
-  if ( c3y == u3_Host.ops_u.rep ) {
-    report();
-    return 0;
-  }
-
-#if 0
-  if ( 0 == getuid() ) {
-    chroot(u3_Host.dir_c);
-    u3_Host.dir_c = "/";
-  }
-#endif
-  u3_ve_sysopt();
-
-  //  Block profiling signal, which should be delievered to exactly one thread.
-  //
-  if ( _(u3_Host.ops_u.pro) ) {
-    sigset_t set;
-
-    sigemptyset(&set);
-    sigaddset(&set, SIGPROF);
-    if ( 0 != pthread_sigmask(SIG_BLOCK, &set, NULL) ) {
-      perror("pthread_sigmask");
-      exit(1);
-    }
-  }
-
   //  Handle SIGTSTP as if it was SIGTERM.
   //
   signal(SIGTSTP, _stop_exit);
 
   printf("~\n");
-  //  printf("welcome.\n");
   printf("urbit %s\n", URBIT_VERSION);
-  printf("urbit: home is %s\n", u3_Host.dir_c);
-  // printf("vere: hostname is %s\n", u3_Host.ops_u.nam_c);
-
-  if ( c3y == u3_Host.ops_u.dem && c3n == u3_Host.ops_u.bat ) {
-    printf("urbit: running as daemon\n");
-  }
+  printf("urbit: running as daemon\n");
 
   //  Seed prng. Don't panic -- just for fuzz testing.
   //
   srand(getpid());
 
-  //  Instantiate process globals.
-  {
-    /*  Boot the image and checkpoint.  Set flags.
-    */
-    {
-      /*  Set pier directory.
-      */
-      u3C.dir_c = u3_Host.dir_c;
-
-      /*  Set GC flag.
-      */
-      if ( _(u3_Host.ops_u.gab) ) {
-        u3C.wag_w |= u3o_debug_ram;
-      }
-
-      /*  Set profile flag.
-      */
-      if ( _(u3_Host.ops_u.pro) ) {
-        u3C.wag_w |= u3o_debug_cpu;
-      }
-
-      /*  Set verbose flag.
-      */
-      if ( _(u3_Host.ops_u.veb) ) {
-        u3C.wag_w |= u3o_verbose;
-      }
-
-      /*  Set quiet flag.
-      */
-      if ( _(u3_Host.ops_u.qui) ) {
-        u3C.wag_w |= u3o_quiet;
-      }
-      
-      /*  Set dry-run flag.
-      */
-      if ( _(u3_Host.ops_u.dry) ) {
-        u3C.wag_w |= u3o_dryrun;
-      }
-    }
-
-    u3_king_commence();
-  }
+  u3_king_commence();
   return 0;
 }

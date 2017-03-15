@@ -1562,35 +1562,21 @@ _pier_loop_time(void)
 static u3_noun
 _pier_boot_seed(u3_pier* pir_u)
 {
-  if ( 0 == u3_Host.ops_u.imp_c ) {
-    u3_noun ten = _pier_zen();
-    return u3nq(c3__make, u3_nul, 11, u3nc(ten, u3_Host.ops_u.fak));
+  u3_noun whu = u3i_bytes(16, pir_u->who_y);
+
+  u3_noun gun = u3_nul;
+  if (c3n == u3_Host.ops_u.fak) {
+    c3_assert(!"must run as fake for now");
   }
   else {
-    u3_noun imp = u3i_string(u3_Host.ops_u.imp_c);
-    u3_noun whu = u3dc("slaw", 'p', u3k(imp));
-
-    if ( (u3_nul == whu) ) {
-      fprintf(stderr, "czar: incorrect format\r\n");
-      c3_assert(0);
-    }
-    else {
-      u3_noun gun = u3_nul;
-      if (c3n == u3_Host.ops_u.fak) {
-        c3_assert(!"must run as fake for now");
-      }
-      else {
-        gun = u3nc(u3_nul, u3_nul);
-      }
-      return u3nq(c3__sith,
-                 u3k(u3t(whu)),
-                 u3k(u3t(gun)),
-                 u3_Host.ops_u.fak);
-
-      u3z(whu); u3z(gun);
-    }
-    u3z(imp);
+    gun = u3nc(u3_nul, u3_nul);
   }
+  return u3nq(c3__sith,
+             u3k(whu),
+             u3k(u3t(gun)),
+             u3_Host.ops_u.fak);
+
+  u3z(whu); u3z(gun);
 }
 #endif
 
@@ -1802,26 +1788,31 @@ u3_pier_stub(void)
 /* _pier_boot_make(): create/load a pier.
 */
 static void
-_pier_boot_make(c3_c* pax_c,
+_pier_boot_make(u3_atom who_n,
+                c3_c* pax_c,
                 c3_c* sys_c)
 {
   u3_pier* pir_u;
 
   pir_u = u3_pier_create(pax_c, sys_c);
-  
+
+  u3r_bytes(0, 16, pir_u->who_y, who_n);
+  u3z(who_n);
+
   _pier_loop_init_pier(pir_u);
 }
 
 /* u3_pier_boot(): start the new pier system.
 */
 void
-u3_pier_boot(c3_c* pax_c,                   //  pier path
+u3_pier_boot(u3_atom who_n,
+             c3_c* pax_c,                   //  pier path
              c3_c* sys_c,                   //  path to boot pill
              uv_prepare_t *pep_u)
 {
   /* make initial pier
   */
-  _pier_boot_make(pax_c, sys_c);
+  _pier_boot_make(who_n, pax_c, sys_c);
 
   /* initialize polling handle
   */

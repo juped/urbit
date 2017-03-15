@@ -29,6 +29,9 @@
       $:  $vent                                         ::  generate event
           p/ovum                                        ::  wire and card
       ==                                                ::
+      $:  $term                                         ::  subscribe to term
+          p/@                                           ::  number
+      ==
   ==                                                    ::
 ::                                                      ::
 ++  doom                                                ::  daemon command
@@ -62,17 +65,18 @@
 ::                                                      ::
 */
 
-void _king_auth(u3_noun auth);
+void _king_auth(u3_moor *mor_p, u3_noun auth);
 
-void _king_wyrd(u3_noun ship_wyrd);
-  void _king_susp(u3_atom ship, u3_noun susp);
-  void _king_vent(u3_atom ship, u3_noun vent);
+void _king_wyrd(u3_moor *mor_p, u3_noun ship_wyrd);
+  void _king_susp(u3_moor *mor_p, u3_atom ship, u3_noun susp);
+  void _king_vent(u3_moor *mor_p, u3_atom ship, u3_noun vent);
+  void _king_term(u3_moor *mor_p, u3_atom ship, u3_noun term);
 
-void _king_doom(u3_noun doom);
-  void _king_boot(u3_noun boot);
-  void _king_exit(u3_noun exit);
-  void _king_pier(u3_noun pier);
-  void _king_root(u3_noun root);
+void _king_doom(u3_moor *mor_p, u3_noun doom);
+  void _king_boot(u3_moor *mor_p, u3_noun boot);
+  void _king_exit(u3_moor *mor_p, u3_noun exit);
+  void _king_pier(u3_moor *mor_p, u3_noun pier);
+  void _king_root(u3_moor *mor_p, u3_noun root);
 
 /* _king_defy_fate(): invalid fate
 */
@@ -85,11 +89,11 @@ _king_defy_fate()
 /* _king_fate(): top-level fate parser
 */
 void
-_king_fate(void *vod_p, u3_noun mat)
+_king_fate(void *mor_p, u3_noun mat)
 {
   u3_noun fate = u3ke_cue(u3k(mat));
   u3_noun load;
-  void (*next)(u3_noun);
+  void (*next)(u3_moor *, u3_noun);
 
   c3_assert(_(u3a_is_cell(fate)));
   c3_assert(_(u3a_is_cat(u3h(fate))));
@@ -110,25 +114,25 @@ _king_fate(void *vod_p, u3_noun mat)
 
   load = u3k(u3t(fate));
   u3z(fate);
-  next(load);
+  next((u3_moor *)mor_p, load);
 }
 
 /* _king_auth(): auth parser
 */
 void
-_king_auth(u3_noun auth)
+_king_auth(u3_moor *mor_p, u3_noun auth)
 {
 }
 
 /* _king_wyrd(): wyrd parser
 */
 void
-_king_wyrd(u3_noun ship_wyrd)
+_king_wyrd(u3_moor *mor_p, u3_noun ship_wyrd)
 {
   u3_atom ship;
   u3_noun wyrd;
   u3_noun load;
-  void (*next)(u3_atom, u3_noun);
+  void (*next)(u3_moor *, u3_atom, u3_noun);
 
   c3_assert(_(u3a_is_cell(ship_wyrd)));
   c3_assert(_(u3a_is_atom(u3h(ship_wyrd))));
@@ -152,20 +156,20 @@ _king_wyrd(u3_noun ship_wyrd)
 
   load = u3k(u3t(wyrd));
   u3z(wyrd);
-  next(ship, load);
+  next(mor_p, ship, load);
 }
 
 /* _king_susp(): susp parser
 */
 void
-_king_susp(u3_atom ship, u3_noun susp)
+_king_susp(u3_moor *mor_p, u3_atom ship, u3_noun susp)
 {
 }
 
 /* _king_vent(): vent parser
 */
 void
-_king_vent(u3_atom ship, u3_noun vent)
+_king_vent(u3_moor *mor_p, u3_atom ship, u3_noun vent)
 {
   /* stub; have to find pier from ship */
   u3z(ship);
@@ -173,13 +177,22 @@ _king_vent(u3_atom ship, u3_noun vent)
   u3z(vent);
 }
 
+/* _king_term(): term subscribe parser
+*/
+void
+_king_term(u3_moor *mor_p, u3_atom ship, u3_noun term)
+{
+  u3z(ship);
+  u3z(term);
+}
+
 /* _king_doom(): doom parser
 */
 void
-_king_doom(u3_noun doom)
+_king_doom(u3_moor *mor_p, u3_noun doom)
 {
   u3_noun load;
-  void (*next)(u3_noun);
+  void (*next)(u3_moor *, u3_noun);
 
   c3_assert(_(u3a_is_cell(doom)));
   c3_assert(_(u3a_is_cat(u3h(doom))));
@@ -203,18 +216,19 @@ _king_doom(u3_noun doom)
 
   load = u3k(u3t(doom));
   u3z(doom);
-  next(load);
+  next(mor_p, load);
 }
 
 /* _king_boot(): boot parser
 */
 void
-_king_boot(u3_noun boot)
+_king_boot(u3_moor *mor_p, u3_noun boot)
 {
-  u3_noun pax_n, sys_n;
+  u3_noun who_n, pax_n, sys_n;
   c3_c *pax_c, *sys_c;
   uv_prepare_t *pep_u = u3a_malloc(sizeof(uv_prepare_t)); /* put in u3_pier? */
 
+  who_n = u3k(u3h(boot));
   pax_n = u3k(u3h(u3t(boot)));
   sys_n = u3k(u3h(u3t(u3t(boot))));
   u3z(boot);
@@ -227,27 +241,27 @@ _king_boot(u3_noun boot)
   if ( pax_c ) {
     fprintf(stderr, "boot %s %s\r\n", pax_c, sys_c);
   }
-  u3_pier_boot(pax_c, sys_c, pep_u);
+  u3_pier_boot(who_n, pax_c, sys_c, pep_u);
 }
 
 /* _king_exit(): exit parser
 */
 void
-_king_exit(u3_noun exit)
+_king_exit(u3_moor *mor_p, u3_noun exit)
 {
 }
 
 /* _king_pier(): pier parser
 */
 void
-_king_pier(u3_noun pier)
+_king_pier(u3_moor *mor_p, u3_noun pier)
 {
 }
 
 /* _king_root(): root parser
 */
 void
-_king_root(u3_noun root)
+_king_root(u3_moor *mor_p, u3_noun root)
 {
 }
 
@@ -296,24 +310,6 @@ _king_socket_connect(uv_stream_t *sock, int status)
   u3_newt_read((u3_moat *)mor_u);
 }
 
-/* _boothack_cb(): callback for the boothack self-connection
-*/
-void
-_boothack_cb(uv_connect_t *conn, int status)
-{
-  u3_mojo *moj_u = conn->data;
-  u3_atom doom;
-  u3_atom pax, sys;
-
-  pax = u3i_string(u3_Host.dir_c);
-  sys = u3_Host.ops_u.pil_c ? u3i_string(u3_Host.ops_u.pil_c) : u3_nul;
-
-  doom = u3ke_jam(u3nc(c3__doom,
-                       u3nc(c3__boot,
-                            u3nq(0, pax, sys, 0))));
-  u3_newt_write(moj_u, doom, 0);
-}
-
 /* _king_loop_init(): stuff that comes before the event loop
 */
 void
@@ -350,14 +346,6 @@ _king_loop_init()
     sig_u->nex_u = u3_Host.sig_u;
     u3_Host.sig_u = sig_u;
   }
-  /* boot hack */
-  {
-    u3_moor *mor_u = c3_malloc(sizeof(u3_moor));
-    uv_connect_t *conn = c3_malloc(sizeof(uv_connect_t));
-    conn->data = mor_u;
-    uv_pipe_init(u3L, &mor_u->pyp_u, 0);
-    uv_pipe_connect(conn, &mor_u->pyp_u, "/tmp/urbit.sock", _boothack_cb);
-  }
 }
 
 /* _king_loop_exit(): cleanup after event loop
@@ -374,10 +362,6 @@ _king_loop_exit()
 
   cod_l = u3a_lush(c3__ames);
   u3_ames_io_exit(u3_pier_stub());
-  u3a_lop(cod_l);
-
-  cod_l = u3a_lush(c3__term);
-  u3_term_io_exit();
   u3a_lop(cod_l);
 
   cod_l = u3a_lush(c3__http);
