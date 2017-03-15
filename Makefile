@@ -357,7 +357,6 @@ V_OFILES=\
        vere/time.o \
        vere/unix.o \
        vere/save.o \
-       vere/serf.o \
        vere/king.o \
        vere/pier.o \
        vere/foil.o \
@@ -367,15 +366,26 @@ V_OFILES=\
 MAIN_FILE =\
        vere/main.o
 
+SERF_FILE =\
+       vere/serf.o
+
 VERE_OFILES=\
        $(OUT_OFILES) \
        $(BASE_OFILES) \
        $(MAIN_FILE) \
        $(V_OFILES)
 
+SERF_OFILES=\
+       $(OUT_OFILES) \
+       $(BASE_OFILES) \
+       $(SERF_FILE) \
+       $(V_OFILES)
+
 VERE_DFILES=$(VERE_OFILES:%.o=.d/%.d)
+SERF_DFILES=$(SERF_OFILES:%.o=.d/%.d)
 
 -include $(VERE_DFILES)
+-include $(SERF_DFILES)
 
 LIBED25519=outside/ed25519/ed25519.a
 
@@ -393,7 +403,7 @@ TAGS=\
        GPATH GTAGS GRTAGS \
        cscope.in.out cscope.po.out cscope.out
 
-all: urbit links
+all: urbit urbit-worker
 
 .MAKEFILE-VERSION: Makefile .make.conf
 	@echo "Makefile update."
@@ -402,11 +412,8 @@ all: urbit links
 .make.conf:
 	@echo "# Set custom configuration here, please!" > ".make.conf"
 
-links: urbit
-	$(LN) $(BIN)/urbit $(BIN)/urbit-worker
-
 urbit: $(BIN)/urbit
-booter: $(BIN)/booter
+urbit-worker: $(BIN)/urbit-worker
 
 $(LIBED25519):
 	$(MAKE) -C outside/ed25519
@@ -434,6 +441,17 @@ $(BIN)/urbit: $(LIBCOMMONMARK) $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(
 	@echo "    CCLD  $(BIN)/urbit"
 	@mkdir -p $(BIN)
 	@$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit $(VERE_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+endif
+
+ifdef NO_SILENT_RULES
+$(BIN)/urbit-worker: $(LIBCOMMONMARK) $(SERF_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+	mkdir -p $(BIN)
+	$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit-worker $(SERF_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+else
+$(BIN)/urbit-worker: $(LIBCOMMONMARK) $(SERF_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBSCRYPT) $(LIBSOFTFLOAT)
+	@echo "    CCLD  $(BIN)/urbit-worker"
+	@mkdir -p $(BIN)
+	@$(CLD) $(CLDOSFLAGS) -o $(BIN)/urbit-worker $(SERF_OFILES) $(LIBED25519) $(LIBANACHRONISM) $(LIBS) $(LIBCOMMONMARK) $(LIBSCRYPT) $(LIBSOFTFLOAT)
 endif
 
 tags: ctags etags gtags cscope
