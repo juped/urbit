@@ -211,21 +211,24 @@ _king_doom(u3_noun doom)
 void
 _king_boot(u3_noun boot)
 {
-  u3_noun pax_n, sys_n;
-  c3_c *pax_c, *sys_c;
+  u3_noun pax_n, sys_n, arv_n;
+  c3_c *pax_c, *sys_c, *arv_c;
   uv_prepare_t *pep_u = u3a_malloc(sizeof(uv_prepare_t)); /* put in u3_pier? */
 
   pax_n = u3k(u3h(u3t(boot)));
   sys_n = u3k(u3h(u3t(u3t(boot))));
+  arv_n = u3k(u3h(u3t(u3t(u3t(boot)))));
   u3z(boot);
 
   pax_c = u3r_string(pax_n);
   u3z(pax_n);
   sys_c = u3r_string(sys_n);
   u3z(sys_n);
+  arv_c = u3r_string(arv_n);
+  u3z(arv_n);
 
-  fprintf(stderr, "boot %s %s\r\n", pax_c, sys_c);
-  u3_pier_boot(pax_c, sys_c, pep_u);
+  fprintf(stderr, "boot %s %s %s\r\n", pax_c, sys_c, arv_c);
+  u3_pier_boot(pax_c, sys_c, arv_c, pep_u);
 }
 
 /* _king_exit(): exit parser
@@ -294,24 +297,6 @@ _king_socket_connect(uv_stream_t *sock, int status)
   u3_newt_read((u3_moat *)mor_u);
 }
 
-/* _boothack_cb(): callback for the boothack self-connection
-*/
-void
-_boothack_cb(uv_connect_t *conn, int status)
-{
-  u3_mojo *moj_u = conn->data;
-  u3_atom doom;
-  u3_atom pax, sys;
-
-  pax = u3i_string(u3_Host.dir_c);
-  sys = u3i_string(u3_Host.ops_u.pil_c);
-
-  doom = u3ke_jam(u3nc(c3__doom,
-                       u3nc(c3__boot,
-                            u3nq(0, pax, sys, 0))));
-  u3_newt_write(moj_u, doom, 0);
-}
-
 /* _king_loop_init(): stuff that comes before the event loop
 */
 void
@@ -348,14 +333,6 @@ _king_loop_init()
     sig_u->nex_u = u3_Host.sig_u;
     u3_Host.sig_u = sig_u;
   }
-  /* boot hack */
-  {
-    u3_moor *mor_u = c3_malloc(sizeof(u3_moor));
-    uv_connect_t *conn = c3_malloc(sizeof(uv_connect_t));
-    conn->data = mor_u;
-    uv_pipe_init(u3L, &mor_u->pyp_u, 0);
-    uv_pipe_connect(conn, &mor_u->pyp_u, "/tmp/urbit.sock", _boothack_cb);
-  }
 }
 
 /* _king_loop_exit(): cleanup after event loop
@@ -372,10 +349,6 @@ _king_loop_exit()
 
   cod_l = u3a_lush(c3__ames);
   u3_ames_io_exit(u3_pier_stub());
-  u3a_lop(cod_l);
-
-  cod_l = u3a_lush(c3__term);
-  u3_term_io_exit();
   u3a_lop(cod_l);
 
   cod_l = u3a_lush(c3__http);

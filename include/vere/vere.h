@@ -725,6 +725,7 @@
           c3_d             gen_d;               //  last event discovered
           c3_d             but_d;               //  boot barrier
           c3_d             key_d[4];            //  save and passkey
+          c3_y             who_y[16];           //  LSB-first identity
           u3_disk*         log_u;               //  event log
           u3_lord*         god_u;               //  computer
           u3_ames*         sam_u;               //  packet interface
@@ -1457,7 +1458,7 @@
       /* u3_pier_create(): create a pier, loading existing.
       */
         u3_pier*
-        u3_pier_create(c3_c* pax_c, c3_c* sys_c);
+        u3_pier_create(c3_c* pax_c, c3_c* sys_c, c3_c *arv_c);
 
       /* u3_pier_interrupt(): interrupt running process.
       */
@@ -1496,6 +1497,7 @@
         void
         u3_pier_boot(c3_c* pax_c,                   //  pier path
                      c3_c* sys_c,                   //  path to boot pill
+                     c3_c *arv_c,                   //  path to arvo (or NULL)
                      uv_prepare_t *pep_u);
 
       /* u3_pier_tank(): dump single tank.

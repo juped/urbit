@@ -20,6 +20,11 @@
         c3_d
         u3m_boot_pier(void);
 
+      /* u3m_boot_lite(): just get a loom for nouns
+      */
+        c3_d
+        u3m_boot_lite(void);
+
       /* u3m_bail(): bail out.  Does not return.
       **
       **  Bail motes:

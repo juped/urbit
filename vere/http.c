@@ -1088,48 +1088,6 @@ _http_start(u3_http* htp_u)
   }
 }
 
-/* _http_write_ports_file(): update .http.ports
-*/
-void
-_http_write_ports_file(c3_c *pax_c)
-{
-  int     pal_i;
-  c3_c    *paf_c;
-  int     por_i;
-  u3_http *htp_u;
-
-  pal_i = strlen(pax_c) + 13; /* includes NUL */
-  paf_c = u3a_malloc(pal_i);
-  snprintf(paf_c, pal_i, "%s/%s", pax_c, ".http.ports");
-
-  por_i = open(paf_c, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-  u3a_free(paf_c);
-
-  for ( htp_u = u3_Host.htp_u; htp_u; htp_u = htp_u->nex_u ) {
-    dprintf(por_i, "%u %s %s\n", htp_u->por_w,
-                   (c3y == htp_u->sec) ? "assumed-secure" : "insecure",
-                   (c3y == htp_u->lop) ? "loopback" : "public");
-  }
-
- c3_sync(por_i);
- close(por_i);
-}
-
-/* _http_release_ports_file(): update .http.ports
-*/
-void
-_http_release_ports_file(c3_c *pax_c)
-{
-  int  pal_i;
-  c3_c *paf_c;
-
-  pal_i = strlen(pax_c) + 13; /* includes NUL */
-  paf_c = u3a_malloc(pal_i);
-  snprintf(paf_c, pal_i, "%s/%s", pax_c, ".http.ports");
-
-  unlink(paf_c);
-}
-
 /* u3_http_io_init(): initialize http I/O.
 */
 void
@@ -1201,8 +1159,6 @@ u3_http_io_talk()
   for ( htp_u = u3_Host.htp_u; htp_u; htp_u = htp_u->nex_u ) {
     _http_start(htp_u);
   }
-
-  _http_write_ports_file(u3_Host.dir_c);
 }
 
 /* u3_http_io_poll(): poll kernel for http I/O.
@@ -1217,5 +1173,4 @@ u3_http_io_poll(void)
 void
 u3_http_io_exit(void)
 {
-  _http_release_ports_file(u3_Host.dir_c);
 }

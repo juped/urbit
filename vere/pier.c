@@ -1247,7 +1247,7 @@ _pier_work_create(u3_pier* pir_u)
 /* u3_pier_create(): create a pier, loading existing.
 */
 u3_pier*
-u3_pier_create(c3_c* pax_c, c3_c* sys_c)
+u3_pier_create(c3_c* pax_c, c3_c* sys_c, c3_c *arv_c)
 {
   u3_pier* pir_u;
  
@@ -1262,8 +1262,8 @@ u3_pier_create(c3_c* pax_c, c3_c* sys_c)
     pir_u->sys_c = c3_malloc(1 + strlen(sys_c)); 
     strcpy(pir_u->sys_c, sys_c);
 
-    pir_u->arv_c = c3_malloc(1 + strlen(u3_Host.ops_u.arv_c)); /* parametrize */
-    strcpy(pir_u->arv_c, u3_Host.ops_u.arv_c);
+    pir_u->arv_c = c3_malloc(1 + strlen(arv_c));
+    strcpy(pir_u->arv_c, arv_c);
 
     pir_u->gen_d = 0;
     pir_u->key_d[0] = pir_u->key_d[1] = pir_u->key_d[2] = pir_u->key_d[3] = 0;
@@ -1406,10 +1406,6 @@ _pier_loop_init(void)
 {
   c3_l cod_l;
 
-  cod_l = u3a_lush(c3__term);
-  u3_term_io_init();
-  u3a_lop(cod_l);
-
   cod_l = u3a_lush(c3__http);
   u3_http_io_init();
   u3a_lop(cod_l);
@@ -1465,10 +1461,6 @@ _pier_loop_wake(u3_pier* pir_u)
   u3_http_ef_bake();
   u3a_lop(cod_l);
  
-  cod_l = u3a_lush(c3__term);
-  u3_term_io_talk();
-  u3_term_ef_bake();
-  u3a_lop(cod_l);
 }
 
 /* _pier_loop_exit(): terminate I/O across the process.
@@ -1484,10 +1476,6 @@ _pier_loop_exit(void)
 
   cod_l = u3a_lush(c3__ames);
   u3_ames_io_exit(u3_pier_stub());
-  u3a_lop(cod_l);
-
-  cod_l = u3a_lush(c3__term); 
-  u3_term_io_exit();
   u3a_lop(cod_l);
 
   cod_l = u3a_lush(c3__http);
@@ -1520,10 +1508,6 @@ _pier_loop_poll(u3_pier* pir_u)
 
   cod_l = u3a_lush(c3__http);
   u3_http_io_poll();
-  u3a_lop(cod_l);
-
-  cod_l = u3a_lush(c3__term);
-  u3_term_io_poll();
   u3a_lop(cod_l);
 
   cod_l = u3a_lush(c3__save);
@@ -1814,11 +1798,12 @@ u3_pier_stub(void)
 */
 static void
 _pier_boot_make(c3_c* pax_c,
-                c3_c* sys_c)
+                c3_c* sys_c,
+                c3_c *arv_c)
 {
   u3_pier* pir_u;
 
-  pir_u = u3_pier_create(pax_c, sys_c);
+  pir_u = u3_pier_create(pax_c, sys_c, arv_c);
   
   _pier_loop_init_pier(pir_u);
 }
@@ -1828,11 +1813,12 @@ _pier_boot_make(c3_c* pax_c,
 void
 u3_pier_boot(c3_c* pax_c,                   //  pier path
              c3_c* sys_c,                   //  path to boot pill
+             c3_c* arv_c,                   //  path to initial sync (or NULL)
              uv_prepare_t *pep_u)
 {
   /* make initial pier
   */
-  _pier_boot_make(pax_c, sys_c);
+  _pier_boot_make(pax_c, sys_c, arv_c);
 
   /* initialize polling handle
   */
