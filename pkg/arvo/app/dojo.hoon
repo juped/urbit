@@ -1046,12 +1046,14 @@
   ++  he-unto                                           ::  result from agent
     |=  [way=wire cit=sign:agent:gall]
     ^+  +>
-    ?.  ?=(%poke-ack -.cit)
-      ~&  [%strange-unto cit]
-      +>
-    ?~  p.cit
-      (he-diff %txt ">=")
-    (he-diff %tan leaf+"dojo: app poke failed" u.p.cit)
+    ?+  -.cit  ~&  [%strange-unto cit]  +>
+      %fact
+        (~(dy-show dy *dojo-project) cage.cit)
+      %poke-ack
+        ?~  p.cit
+          (he-diff %txt ">=")
+        (he-diff %tan leaf+"dojo: app poke failed" u.p.cit)
+    ==
   ::
   ++  he-wool
     |=  [way=wire =sign:agent:gall]
